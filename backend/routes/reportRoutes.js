@@ -25,8 +25,16 @@ router.post('/', authenticate, async (req, res, next) => {
       reportedBy: req.user.userId
     });
 
+    console.log('\n==============================');
+    console.log('REPORT SAVED SUCCESSFULLY');
+    console.log('Report ID:', report._id.toString());
+    console.log('User ID:', req.user.userId);
+    console.log('Database: disaster_response');
+    console.log('==============================\n');
+
     res.status(201).json({ message: 'Report submitted successfully', report });
   } catch (error) {
+    console.error('REPORT SAVE ERROR:', error);
     next(error);
   }
 });
@@ -82,6 +90,7 @@ router.patch('/:id', authenticate, requireAuthority, async (req, res, next) => {
 
     res.json({ message: 'Report updated successfully', report });
   } catch (error) {
+    console.error('REPORT UPDATE ERROR:', error);
     next(error);
   }
 });
