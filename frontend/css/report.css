@@ -1,1 +1,167 @@
-.form-page{max-width:820px;margin:auto;padding:58px 24px 70px}.form-intro{margin-bottom:28px}.form-intro h1{font-size:38px;letter-spacing:-1.5px}.form-intro p{color:var(--muted);font-size:14px;max-width:620px;margin-top:10px}.report-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 12px 35px #1720330b}.field{margin-bottom:20px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.field label span{color:#8a94a4;font-weight:500}.field input,.field select,.field textarea{width:100%;border:1px solid #dfe4eb;border-radius:8px;padding:11px 12px;background:#fff;color:var(--text);font:inherit;font-size:13px;outline:none}.field textarea{resize:vertical;min-height:120px}.field input:focus,.field select:focus,.field textarea:focus{border-color:#93b4f8;box-shadow:0 0 0 3px #2563eb12}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}.location-box{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px;background:#f8fafc;border:1px solid var(--line);border-radius:9px}.location-box strong,.location-box small{display:block}.location-box strong{font-size:12px}.location-box small{color:var(--muted);font-size:10px;margin-top:3px}.location-box .btn{min-height:38px;font-size:11px;white-space:nowrap}.form-footer{border-top:1px solid var(--line);padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:15px}.form-footer>span{color:#8a94a4;font-size:10px}@media(max-width:600px){.form-page{padding:40px 16px}.report-card{padding:20px}.form-intro h1{font-size:32px}.two-col{grid-template-columns:1fr;gap:0}.location-box{align-items:flex-start;flex-direction:column}.form-footer{align-items:stretch;flex-direction:column}.form-footer .btn{width:100%}}
+.form-page {
+  max-width: 820px;
+  margin: auto;
+  padding: 58px 24px 70px;
+}
+
+.form-intro {
+  margin-bottom: 28px;
+}
+
+.form-intro h1 {
+  font-size: 38px;
+  letter-spacing: -1.5px;
+}
+
+.form-intro p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 620px;
+  margin-top: 10px;
+}
+
+.report-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 12px 35px #1720330b;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.field label span {
+  color: #8a94a4;
+  font-weight: 500;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid #dfe4eb;
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #93b4f8;
+  box-shadow: 0 0 0 3px #2563eb12;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.location-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.location-box strong,
+.location-box small {
+  display: block;
+}
+
+.location-box strong {
+  font-size: 12px;
+}
+
+.location-box small {
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.location-box .btn {
+  min-height: 38px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.form-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.form-footer > span {
+  color: #8a94a4;
+  font-size: 10px;
+}
+
+.form-message {
+  display: none;
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  background: #eef8f3;
+  color: #176b4c;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .form-page {
+    padding: 40px 16px;
+  }
+
+  .report-card {
+    padding: 20px;
+  }
+
+  .form-intro h1 {
+    font-size: 32px;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .location-box {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-footer .btn {
+    width: 100%;
+  }
+}
