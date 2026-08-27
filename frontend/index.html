@@ -3,9 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Disaster Response Intelligence System">
   <title>Disaster Response Intelligence</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Disaster Response Intelligence System</h1>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">DR</span>
+      <span><strong>Disaster Response</strong><small>Intelligence System</small></span>
+    </a>
+    <nav class="topnav">
+      <a class="active" href="index.html">Home</a>
+      <a href="report.html">Report an Incident</a>
+      <a href="dashboard.html">Authority Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="home-page">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">DISASTER RESPONSE INTELLIGENCE</span>
+        <h1>From scattered reports to <span>actionable response.</span></h1>
+        <p>Help report incidents from the ground. Our system organizes reports, identifies related incidents and helps response teams focus on what needs attention first.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="report.html">Report an incident <span>→</span></a>
+          <a class="btn btn-secondary" href="dashboard.html">View dashboard</a>
+        </div>
+        <div class="trust-row">
+          <span>● Simple reporting</span>
+          <span>● AI-assisted analysis</span>
+          <span>● Map-based awareness</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="panel-heading"><span>LIVE RESPONSE OVERVIEW</span><i>Demo</i></div>
+        <div class="mini-map">
+          <div class="map-grid"></div>
+          <span class="map-dot dot-1"></span><span class="map-dot dot-2"></span><span class="map-dot dot-3"></span>
+          <div class="map-route route-1"></div><div class="map-route route-2"></div>
+          <div class="map-label label-1">High priority</div>
+          <div class="map-label label-2">Road blockage</div>
+        </div>
+        <div class="overview-stats">
+          <div><strong>24</strong><span>Reports</span></div>
+          <div><strong>8</strong><span>Incidents</span></div>
+          <div><strong>3</strong><span>Critical</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section">
+      <div class="section-heading">
+        <span class="eyebrow">HOW IT WORKS</span>
+        <h2>A clearer picture when every minute matters.</h2>
+      </div>
+      <div class="steps">
+        <article><span class="step-number">01</span><h3>Report</h3><p>Citizens send a simple incident report with location and useful details.</p></article>
+        <article><span class="step-number">02</span><h3>Understand</h3><p>AI helps classify reports, identify urgency and connect related reports.</p></article>
+        <article><span class="step-number">03</span><h3>Prioritize</h3><p>Incidents are ranked so response teams can focus on higher-priority situations.</p></article>
+        <article><span class="step-number">04</span><h3>Respond</h3><p>Authorities use the map and status tools to coordinate and track response.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>Disaster Response Intelligence System</span><span>Hackathon MVP • 2026</span></footer>
 </body>
 </html>
