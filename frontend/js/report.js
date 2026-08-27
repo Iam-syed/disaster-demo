@@ -44,7 +44,9 @@ form?.addEventListener('submit', async (event) => {
     return;
   }
 
-  const token = localStorage.getItem('token');
+  // auth.js stores the JWT under disasterToken.
+  const token = localStorage.getItem('disasterToken');
+
   const submitButton = form.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   submitButton.textContent = 'Submitting...';
@@ -61,7 +63,9 @@ form?.addEventListener('submit', async (event) => {
   };
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {
+      'Content-Type': 'application/json'
+    };
 
     if (token) {
       headers.Authorization = `Bearer ${token}`;
