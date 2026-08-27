@@ -1,0 +1,748 @@
+DISASTER RESPONSE INTELLIGENCE SYSTEM
+====================================
+JURY / HACKATHON PROJECT EXPLANATION
+
+Purpose of this file
+--------------------
+This document is a speaking guide for explaining the project to judges. It covers the problem, solution, architecture, technology choices, current implementation, planned intelligence features, security, database design, API flow, likely jury questions, limitations, and demo flow.
+
+IMPORTANT: WHAT IS CURRENTLY IMPLEMENTED
+----------------------------------------
+The current working MVP includes:
+1. Citizen account creation and login.
+2. JWT-based authentication.
+3. Citizen disaster report submission.
+4. Location data using latitude and longitude.
+5. Storage of reports in MongoDB.
+6. Reporter-to-user relationship using MongoDB ObjectId.
+7. Authority-only access to the report listing API.
+8. Authority dashboard showing live reports from the database.
+9. Report statistics such as total, critical, high and pending counts.
+10. Status filtering and dashboard refresh.
+11. MongoDB Atlas connectivity has been tested successfully.
+
+The authority incident-processing workflow, AI classification, duplicate clustering, map visualization, route blockage intelligence, and public cloud deployment are NOT yet fully implemented in the current MVP unless separately added later. Do not claim an unfinished feature as completed during the demo.
+
+============================================================
+1. PROJECT IN ONE MINUTE
+============================================================
+
+Project name:
+Disaster Response Intelligence System
+
+One-line explanation:
+A platform that converts scattered citizen disaster reports into structured, authenticated and actionable information for authorities.
+
+Short jury pitch:
+During disasters, information is often scattered across phone calls, messages, social media and individual reports. The main challenge is not only collecting reports, but helping responders understand which incidents require attention first. Our system provides a structured reporting interface for citizens and an authority dashboard that collects those reports in one place. Each report contains the incident type, description, affected people and location, and is linked to the authenticated reporter. The backend securely processes the request and stores it in MongoDB. The next intelligence layer can classify incidents, estimate severity and urgency, identify duplicates, cluster related reports and prioritize incidents for response.
+
+============================================================
+2. THE PROBLEM
+============================================================
+
+During floods, landslides, fires, storms and other disasters, authorities can receive many reports from different sources.
+
+Problems with scattered information:
+- Reports can arrive in different formats.
+- The same incident may be reported multiple times.
+- Important information may be buried among less urgent reports.
+- Location may be unclear or inconsistent.
+- Authorities need to know who reported an incident and when.
+- Manually reading many reports takes time.
+- A simple list of reports does not automatically tell responders what should be handled first.
+
+Our focus is therefore not simply "collect disaster reports." The focus is turning reports into response intelligence.
+
+============================================================
+3. OUR SOLUTION
+============================================================
+
+The system has two main user sides.
+
+Citizen side:
+- Create an account.
+- Sign in.
+- Submit a disaster report.
+- Provide incident type and description.
+- Provide number of people affected.
+- Provide occurrence time when available.
+- Provide latitude and longitude.
+- Optionally provide an image URL.
+
+Authority side:
+- Sign in using an authority account.
+- Access the authority dashboard.
+- View incoming reports.
+- See reporter information.
+- See location and affected people.
+- Filter reports by status.
+- Monitor severity and status.
+- Refresh the dashboard to retrieve current reports.
+
+Planned intelligence layer:
+- AI incident classification.
+- Severity and urgency extraction.
+- Duplicate report detection.
+- Incident clustering.
+- Priority scoring.
+- Map-based response visualization.
+- Route blockage/status information.
+- Status progression from new to resolved.
+
+============================================================
+4. WHY THIS IS DIFFERENT FROM A BASIC REPORTING APP
+============================================================
+
+A normal reporting app mainly answers:
+"Can a citizen submit a report?"
+
+Our intended system answers:
+"After many reports arrive, how can responders understand and prioritize them?"
+
+The reporting interface is therefore the data collection layer. The authority dashboard is the operational layer. The AI/intelligence layer is intended to convert raw reports into actionable response information.
+
+This distinction is important when explaining the project.
+
+============================================================
+5. SYSTEM ARCHITECTURE
+============================================================
+
+Current architecture:
+
+Citizen browser
+      |
+      | HTTP request / JSON
+      v
+Frontend: HTML + CSS + JavaScript
+      |
+      | REST API request
+      v
+Node.js + Express backend
+      |
+      | Mongoose
+      v
+MongoDB / MongoDB Atlas
+      |
+      v
+Authority dashboard
+
+Authentication flow:
+
+Citizen/Authority
+      |
+      | Login
+      v
+Backend verifies credentials
+      |
+      v
+JWT token generated
+      |
+      v
+Token stored by frontend
+      |
+      | Authorization: Bearer <token>
+      v
+Protected API
+
+============================================================
+6. TECHNOLOGY STACK
+============================================================
+
+FRONTEND
+--------
+HTML5
+Used to create the structure of pages such as authentication, report submission and authority dashboard.
+
+CSS3
+Used for layout, responsive design, cards, forms, badges, navigation and visual hierarchy.
+
+JavaScript
+Used for browser-side logic, API requests, authentication state, form handling, report rendering and dashboard updates.
+
+Why no frontend framework is required for the MVP?
+The project is small enough for vanilla HTML/CSS/JavaScript. It reduces setup complexity and makes the implementation easy to understand and demonstrate. A framework such as React could be introduced later if the frontend becomes much larger.
+
+BACKEND
+-------
+Node.js
+Runs JavaScript on the server. It is suitable for this project because the frontend already uses JavaScript and Node.js provides a simple way to build the API.
+
+Express.js
+A Node.js web framework used to define API routes, middleware and HTTP request/response handling.
+
+Example API groups:
+- /api/auth
+- /api/reports
+
+CORS
+Allows the browser frontend and backend to communicate when they are served from different origins during development/deployment.
+
+dotenv
+Loads environment variables such as the MongoDB URI and JWT secret from .env instead of hard-coding secrets into source code.
+
+DATABASE
+--------
+MongoDB
+A document-oriented NoSQL database. It is suitable because disaster reports are naturally represented as documents containing fields such as type, description, location, people affected, status, severity and reporter.
+
+Mongoose
+An ODM (Object Data Modeling) library for MongoDB. It provides schemas, validation, models and convenient database operations from Node.js.
+
+MongoDB Atlas
+The cloud-hosted MongoDB service used for deployment. It allows the deployed backend to access the database without depending on a MongoDB server running on the developer's laptop.
+
+AUTHENTICATION / SECURITY
+-------------------------
+JSON Web Token (JWT)
+Used for stateless authentication. After login, the backend issues a signed token. The frontend sends that token with protected API requests.
+
+bcryptjs
+Used to hash passwords rather than storing plain-text passwords.
+
+Role-based authorization
+The system distinguishes roles such as citizen and authority. The authority middleware checks the decoded JWT role before allowing access to protected authority endpoints.
+
+============================================================
+7. WHY MONGODB INSTEAD OF MYSQL?
+============================================================
+
+Possible jury question:
+"Why did you choose MongoDB?"
+
+Answer:
+We chose MongoDB because the main entities are document-like and contain nested data, especially the location object. MongoDB lets us store a report as a single document. It also works naturally with JavaScript/Node.js through Mongoose and is convenient for rapid hackathon development. A relational database such as MySQL could also solve the problem, but MongoDB gives us a flexible document model that fits the report structure well.
+
+If asked whether MongoDB is always better:
+No. Database choice depends on requirements. A relational database could be preferable where complex joins and strongly relational transactions dominate. For this MVP, MongoDB is a practical fit.
+
+============================================================
+8. DATABASE DESIGN
+============================================================
+
+USER COLLECTION
+---------------
+The user model stores account information and role.
+Important concept:
+- name
+- email
+- password hash
+- role
+
+REPORT COLLECTION
+-----------------
+A report contains:
+- type
+- description
+- peopleAffected
+- occurredAt
+- location.latitude
+- location.longitude
+- location.address
+- photoUrl
+- status
+- severity
+- reportedBy
+- createdAt / updatedAt
+
+The reporter is stored as a MongoDB ObjectId reference to the User collection.
+
+Why ObjectId reference?
+Instead of duplicating the entire user record inside every report, the report stores the user's ID. The backend can populate the reference when authorities view reports. This gives us the reporter name/email while keeping the relationship structured.
+
+============================================================
+9. REPORT DATA FLOW
+============================================================
+
+1. Citizen logs in.
+2. Backend authenticates the credentials.
+3. Backend returns a JWT.
+4. Frontend stores the token.
+5. Citizen fills the report form.
+6. Frontend sends JSON to POST /api/reports.
+7. The Authorization header contains the Bearer token.
+8. Authentication middleware verifies the JWT.
+9. Backend extracts the authenticated user's ID from the token.
+10. Backend validates required report information.
+11. Mongoose creates the Report document.
+12. MongoDB stores the report.
+13. Backend returns HTTP 201 Created.
+14. Authority dashboard calls GET /api/reports.
+15. Authority middleware checks the role.
+16. Backend retrieves reports and populates reporter information.
+17. Dashboard displays the reports.
+
+============================================================
+10. IMPORTANT HTTP STATUS CODES
+============================================================
+
+200 OK
+Request succeeded.
+
+201 Created
+A new report or account was successfully created.
+
+400 Bad Request
+Required or invalid input was supplied.
+
+401 Unauthorized
+Authentication is missing, invalid or expired.
+
+403 Forbidden
+The user is authenticated but does not have authority permission.
+
+404 Not Found
+Requested resource does not exist.
+
+500 Internal Server Error
+Unexpected server-side failure.
+
+============================================================
+11. REST API EXPLANATION
+============================================================
+
+POST /api/auth/register
+Creates a user account.
+
+POST /api/auth/login
+Checks credentials and returns an authentication token.
+
+POST /api/reports
+Creates a new disaster report. Authentication is required.
+
+GET /api/reports
+Returns reports for the authority dashboard. Authentication and authority role are required.
+
+GET /api/reports/:id
+Returns one report. Authentication and authority role are required.
+
+PATCH /api/reports/:id
+Intended for authority updates such as status, severity and priority score.
+
+GET /api/health
+Simple health endpoint used to verify that the backend is running.
+
+GET /
+Returns basic backend service information.
+
+============================================================
+12. JWT EXPLANATION FOR THE JURY
+============================================================
+
+Question:
+"How does authentication work?"
+
+Answer:
+When the user logs in, the backend verifies the email and password. If valid, it creates a signed JWT containing the user's identity and role. The frontend sends the token in the Authorization header for protected requests. Middleware verifies the token before the request reaches the protected route. For authority routes, a second middleware checks whether the role is authority.
+
+Question:
+"Why JWT?"
+
+Answer:
+JWT provides a simple stateless authentication mechanism for a REST API. The backend does not need to maintain a traditional server-side login session for every request.
+
+Question:
+"Where is the password stored?"
+
+Answer:
+The password should never be stored as plain text. bcryptjs is used to hash passwords before storage.
+
+============================================================
+13. SECURITY MEASURES
+============================================================
+
+Implemented / included in the backend design:
+- Password hashing with bcryptjs.
+- JWT authentication.
+- Protected report submission endpoint.
+- Protected authority report retrieval.
+- Role-based authorization.
+- Environment variables for secrets and database connection strings.
+- .env excluded from Git using .gitignore.
+- Input validation for required report fields.
+- Mongoose schema validation for controlled status and severity values.
+- CORS configuration for frontend/backend communication.
+
+Important production improvements:
+- Restrict CORS to the real frontend domain instead of allowing every origin.
+- Use strong secrets stored in the hosting provider's secret/environment settings.
+- Add rate limiting.
+- Add stronger request validation and sanitization.
+- Add audit logs for authority actions.
+- Add HTTPS-only deployment.
+- Use least-privilege database credentials.
+- Add monitoring and backups.
+
+============================================================
+14. AI / INTELLIGENCE LAYER
+============================================================
+
+The core future intelligence layer should operate after a report is submitted.
+
+A useful pipeline is:
+
+Raw report
+   |
+   v
+Text preprocessing
+   |
+   v
+Incident classification
+   |
+   v
+Severity / urgency extraction
+   |
+   v
+Duplicate detection
+   |
+   v
+Incident clustering
+   |
+   v
+Priority scoring
+   |
+   v
+Authority dashboard
+
+INCIDENT CLASSIFICATION
+-----------------------
+Example:
+Input: "Water has entered several houses after heavy rain."
+Possible class: Flood.
+
+SEVERITY / URGENCY
+------------------
+The model can look at signals such as:
+- number of people affected
+- danger described in text
+- immediate threat
+- infrastructure damage
+- accessibility problems
+- location/context
+
+The AI should produce a suggestion, not blindly replace human judgment.
+
+DUPLICATE DETECTION
+-------------------
+Multiple citizens may report the same incident.
+A duplicate-detection system can compare:
+- geographic distance
+- incident type
+- time window
+- semantic similarity of descriptions
+
+If several reports are likely about the same event, they can be clustered into one incident while preserving the individual reports as evidence.
+
+PRIORITY SCORING
+----------------
+A possible conceptual score is:
+Priority = severity + urgency + people affected + vulnerability + accessibility impact
+
+The exact formula should be calibrated using testing/data rather than presented as a scientifically validated formula unless it has actually been evaluated.
+
+============================================================
+15. WHY AI IS USEFUL HERE
+============================================================
+
+Question:
+"Why use AI? Can't authorities just read the reports?"
+
+Answer:
+They can for a small number of reports. The problem becomes difficult when many reports arrive simultaneously. AI can help summarize, classify, identify similar reports and surface potentially urgent incidents so human responders can review the most important information faster.
+
+Question:
+"Does AI make the final decision?"
+
+Answer:
+Ideally, no. The system should be human-in-the-loop. AI provides recommendations and prioritization, while authorized responders retain decision-making responsibility.
+
+============================================================
+16. MAP / LOCATION FEATURE
+============================================================
+
+Why latitude and longitude?
+Because a disaster report is geographically meaningful. Two reports with identical text can require completely different responses depending on location.
+
+Location enables:
+- map visualization
+- nearby incident grouping
+- distance-based duplicate detection
+- route planning
+- identification of affected areas
+- authority resource allocation
+
+Possible future map display:
+- Red: critical
+- Orange: high
+- Yellow: medium
+- Green: resolved
+
+Do not claim a live map integration unless it is actually implemented.
+
+============================================================
+17. ROUTE BLOCKAGE FEATURE
+============================================================
+
+The proposed route intelligence feature would allow authorities to see whether roads or routes are affected.
+
+Example:
+Flood report + road blockage report
+        |
+        v
+Affected route identified
+        |
+        v
+Authority dashboard warns responders
+        |
+        v
+Alternative route can be considered
+
+This is valuable because the best response location is not enough; responders also need to know whether they can physically reach it.
+
+============================================================
+18. CURRENT MVP VS FUTURE SYSTEM
+============================================================
+
+CURRENT MVP:
+- Authentication
+- Citizen reporting
+- MongoDB storage
+- Reporter relationship
+- Authority dashboard
+- Real API communication
+
+NEXT IMPLEMENTATION:
+- Authority incident detail/update page
+- Status transitions
+- Severity editing
+- Priority score
+- Map
+
+INTELLIGENCE LAYER:
+- AI classification
+- Severity/urgency extraction
+- Duplicate detection
+- Clustering
+- Priority ranking
+
+ADVANCED RESPONSE LAYER:
+- Route blockage
+- Resource allocation
+- Incident timeline
+- Notifications
+- Analytics
+
+Be transparent about which layer is currently demonstrated.
+
+============================================================
+19. LIKELY JURY QUESTIONS + ANSWERS
+============================================================
+
+Q1. What problem are you solving?
+A: We are solving the problem of converting scattered citizen disaster reports into structured, authenticated and actionable response information for authorities.
+
+Q2. What is your main innovation?
+A: The focus is the intelligence pipeline on top of citizen reporting: classification, duplicate/cluster detection and priority ranking, rather than simply collecting reports.
+
+Q3. Why not just use WhatsApp or social media?
+A: Those channels are useful for communication but the information is unstructured and difficult to prioritize systematically. Our platform standardizes the information and connects it directly to an authority workflow.
+
+Q4. Why not just use an existing emergency number?
+A: Emergency services remain essential. Our system is complementary: it organizes citizen-generated incident information and provides structured intelligence for response coordination.
+
+Q5. Why MongoDB?
+A: Reports are document-shaped, contain nested location data and fit naturally with Node.js/JavaScript. MongoDB also supports rapid development.
+
+Q6. Why Node.js?
+A: It allows us to use JavaScript across frontend and backend and is well suited to API-driven applications.
+
+Q7. Why Express?
+A: Express provides simple routing and middleware for REST APIs, making authentication and protected endpoints straightforward.
+
+Q8. How do you secure the API?
+A: JWT authentication verifies identity, role-based middleware protects authority endpoints, passwords are hashed, and secrets are stored in environment variables rather than source code.
+
+Q9. What happens if an attacker changes the user role in the browser?
+A: The browser is not trusted. The backend reads and verifies the signed JWT. Authority access is decided by backend middleware, not by a frontend button or page.
+
+Q10. What happens if the same disaster is reported 100 times?
+A: That is one of the problems our intelligence layer is designed to address. Reports can be compared using location, time, type and semantic similarity, then clustered as likely duplicates or related incidents.
+
+Q11. How will you detect duplicates?
+A: Use a combination of geographic distance, time proximity, incident type and NLP/embedding similarity. A threshold can determine whether reports are likely related.
+
+Q12. How will you prioritize incidents?
+A: Use factors such as severity, urgency, people affected, vulnerability and accessibility. The system can produce a priority score and rank incidents for authority review.
+
+Q13. What if AI makes a wrong classification?
+A: AI should be treated as decision support, not absolute truth. Authorities can verify or override the AI recommendation, and feedback can later be used to improve the model.
+
+Q14. What if there is no internet during a disaster?
+A: The current web MVP requires internet connectivity to communicate with the backend. Offline-first operation would require additional design such as local storage, synchronization and possibly alternative communication channels. We should not claim offline functionality unless implemented.
+
+Q15. Can this scale?
+A: The architecture separates frontend, API and database, which gives a foundation for scaling. For larger loads we would add proper cloud deployment, indexing, caching, queues, monitoring and horizontal scaling.
+
+Q16. Why not use MySQL?
+A: MySQL could work. MongoDB was selected because the report is naturally a document and contains nested location data. The choice is based on project fit rather than claiming MongoDB is universally superior.
+
+Q17. What if MongoDB goes down?
+A: A production system needs database backups, monitoring, retry/error handling and a highly available deployment. The hackathon MVP demonstrates the core flow but does not claim enterprise-level availability.
+
+Q18. What data do you collect?
+A: Account information needed for authentication and structured incident information such as type, description, affected people and location. Production deployment should apply data minimization and privacy controls.
+
+Q19. How do you prevent fake reports?
+A: Authentication gives accountability, but authentication alone does not prove a report is true. A production system can add verification signals, reputation/risk scoring, corroboration from nearby reports and authority verification.
+
+Q20. How do you handle privacy?
+A: Collect only information needed for response, protect credentials, restrict authority access and avoid exposing unnecessary personal information publicly. Production systems should also define retention and access policies.
+
+Q21. Why use latitude and longitude instead of only an address?
+A: Coordinates are machine-readable and precise. They support maps, distance calculations and clustering. An address can be stored as an additional human-readable field.
+
+Q22. Why is the reporter stored as ObjectId?
+A: It creates a reference to the User document, avoids duplicating user information in every report and allows the backend to populate reporter details when authorized.
+
+Q23. What is Mongoose?
+A: Mongoose is an ODM for MongoDB in Node.js. It gives us schemas, validation, models and database operations.
+
+Q24. What is middleware in Express?
+A: Middleware is a function that runs during request processing. We use authentication middleware to verify JWTs and authorization middleware to check authority roles before protected routes execute.
+
+Q25. What is CORS?
+A: CORS is a browser security mechanism controlling which origins can make cross-origin requests. We use it so the frontend can communicate with the backend when hosted separately. In production, it should be restricted to trusted origins.
+
+Q26. What is REST API?
+A: It is an HTTP-based interface where resources are accessed using endpoints and methods such as GET, POST and PATCH. Our frontend communicates with the backend through these endpoints.
+
+Q27. Why separate frontend and backend?
+A: It makes responsibilities clear. The frontend handles user interaction, the backend handles business logic/security/database access, and the database stores persistent data. It also makes independent deployment possible.
+
+Q28. What is the role of MongoDB Atlas?
+A: It provides managed cloud hosting for MongoDB so the backend can access the database remotely after deployment.
+
+Q29. Why is .env not on GitHub?
+A: It contains secrets such as database credentials and JWT configuration. The .env file is ignored by Git so credentials are not committed to the repository.
+
+Q30. What would you add if given another month?
+A: I would complete the AI pipeline, add map visualization, duplicate clustering, authority status workflow, route blockage integration, notifications, audit logs, stronger security, testing and production monitoring.
+
+============================================================
+20. DEMO SCRIPT
+============================================================
+
+Use this order during the jury demo:
+
+1. Start with the problem.
+2. Show citizen login/register.
+3. Create/login as a citizen.
+4. Submit a disaster report.
+5. Show the successful API response.
+6. Show MongoDB Atlas / database record if appropriate.
+7. Log in as authority.
+8. Open authority dashboard.
+9. Show that the report appears in the dashboard.
+10. Explain the reporter relationship.
+11. Explain how JWT protects the authority endpoint.
+12. Explain the intelligence layer and demonstrate only features that are actually implemented.
+13. End with impact and future scalability.
+
+Suggested closing statement:
+"Our MVP establishes the complete data pipeline from an authenticated citizen report to an authority-facing response dashboard. The next layer transforms those raw reports into intelligence by identifying incident type, severity, duplicates and priority. The goal is to reduce information overload and help responders focus on the incidents that need attention first."
+
+============================================================
+21. IMPACT
+============================================================
+
+Potential impact:
+- Faster understanding of incoming incidents.
+- Structured disaster information.
+- Better visibility for authorities.
+- Reduced manual sorting of reports.
+- Identification of duplicate/related reports.
+- Geographic awareness of incidents.
+- More systematic prioritization.
+- Better foundation for coordinated response.
+
+Do not claim measured improvements such as "50% faster response" unless the team has actually tested and measured them.
+
+============================================================
+22. LIMITATIONS
+============================================================
+
+Current limitations:
+- The current MVP requires internet connectivity.
+- AI accuracy depends on training/evaluation data and model quality.
+- Citizen reports can contain false or incomplete information.
+- Location can be inaccurate if the device/location input is inaccurate.
+- The current prototype is not an enterprise emergency-response system.
+- Production deployment requires stronger security, monitoring, rate limiting, backups and access controls.
+
+Being honest about limitations makes the technical explanation stronger.
+
+============================================================
+23. TECHNICAL TERMS TO KNOW
+============================================================
+
+Frontend = code running in the browser.
+Backend = server-side application handling API requests and business logic.
+API = interface through which software components communicate.
+REST = common HTTP-based API style.
+Node.js = JavaScript runtime for server-side applications.
+Express = Node.js web framework.
+MongoDB = document-oriented NoSQL database.
+Mongoose = ODM for MongoDB.
+JWT = signed token used for authentication.
+Middleware = function that runs during HTTP request processing.
+CORS = cross-origin browser access control mechanism.
+CRUD = Create, Read, Update, Delete.
+ObjectId = MongoDB identifier used for documents/references.
+Schema = defined structure/validation rules for data.
+Cloud database = database hosted on a remote managed service.
+AI classification = assigning an input to an incident category.
+NLP = Natural Language Processing, used to analyze text.
+Embedding = numerical representation of text useful for similarity comparison.
+Clustering = grouping similar records or incidents.
+Priority scoring = assigning a numerical/ranked value to help decide what should be handled first.
+Human-in-the-loop = AI assists people while authorized humans retain final control.
+
+============================================================
+24. VERY SHORT TECH STACK ANSWER
+============================================================
+
+If a jury asks "What technologies did you use?", say:
+
+"We use HTML, CSS and JavaScript on the frontend, Node.js with Express on the backend, MongoDB with Mongoose for data storage, JWT and bcryptjs for authentication and password security, and MongoDB Atlas for cloud database deployment. The architecture is a REST API between the frontend and backend."
+
+============================================================
+25. VERY SHORT PROJECT ANSWER
+============================================================
+
+If asked "Explain your project in 20 seconds":
+
+"Our Disaster Response Intelligence System collects structured disaster reports from authenticated citizens and presents them to authorities through a centralized dashboard. Each report includes location and affected people and is linked to the reporter. The intelligence layer is designed to classify incidents, detect duplicates, estimate severity and prioritize cases so authorities can focus on the most urgent situations first."
+
+============================================================
+26. FINAL JURY MINDSET
+============================================================
+
+Remember these five points:
+
+1. Explain the problem before the technology.
+2. Explain why each technology was chosen.
+3. Never claim a feature that is not implemented.
+4. Explain AI as decision support, not magic.
+5. Be ready to explain the full request flow from browser to API to database.
+
+The strongest technical story is:
+
+Citizen report
+   -> Authentication
+   -> REST API
+   -> Validation
+   -> MongoDB
+   -> Authority dashboard
+   -> Intelligence / prioritization
+   -> Human response
+
+END OF EXPLANATION
