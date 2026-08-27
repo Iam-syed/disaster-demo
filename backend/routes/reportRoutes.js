@@ -1,14 +1,15 @@
 const express = require('express');
 const Report = require('../models/Report');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, requireAuthority } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Anyone can submit a report for the MVP. If logged in, link it to that user.
 router.post('/', async (req, res, next) => {
   try {
     const { type, description, peopleAffected, occurredAt, location, photoUrl } = req.body;
 
-    if (!type || !description || !location?.latitude || !location?.longitude) {
+    if (!type || !description || location?.latitude === undefined || location?.longitude === undefined) {
       return res.status(400).json({
         error: 'Type, description and valid latitude/longitude are required'
       });
@@ -20,7 +21,8 @@ router.post('/', async (req, res, next) => {
       peopleAffected,
       occurredAt,
       location,
-      photoUrl
+      photoUrl,
+      reportedBy: req.user?.userId || null
     });
 
     res.status(201).json({ message: 'Report submitted successfully', report });
@@ -29,7 +31,8 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.get('/', authenticate, async (req, res, next) => {
+// Authorities can view all reports.
+router.get('/', authenticate, requireAuthority, async (req, res, next) => {
   try {
     const reports = await Report.find()
       .sort({ createdAt: -1 })
@@ -41,7 +44,8 @@ router.get('/', authenticate, async (req, res, next) => {
   }
 });
 
-router.get('/:id', authenticate, async (req, res, next) => {
+// Authorities can view a specific report.
+router.get('/:id', authenticate, requireAuthority, async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id)
       .populate('reportedBy', 'name email role');
@@ -51,6 +55,32 @@ router.get('/:id', authenticate, async (req, res, next) => {
     }
 
     res.json(report);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Authorities can update report status/severity/priority.
+router.patch('/:id', authenticate, requireAuthority, async (req, res, next) => {
+  try {
+    const allowed = ['status', 'severity', 'priorityScore'];
+    const updates = {};
+
+    for (const field of allowed) {
+      if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
+
+    const report = await Report.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    ).populate('reportedBy', 'name email role');
+
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    res.json({ message: 'Report updated successfully', report });
   } catch (error) {
     next(error);
   }
