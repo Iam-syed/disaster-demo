@@ -3,95 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Authority Dashboard</title>
+  <title>Authority Dashboard | Disaster Response</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="index.html">
-      <span class="brand-mark">DR</span>
-      <span><strong>Disaster Response</strong><small>Authority Console</small></span>
-    </a>
-    <nav class="topnav">
-      <a href="index.html">Home</a>
-      <a href="report.html">Report</a>
-      <a class="active" href="dashboard.html">Dashboard</a>
-    </nav>
+    <a class="brand" href="index.html"><span class="brand-mark">DR</span><span><strong>Disaster Response</strong><small>Authority Console</small></span></a>
+    <nav class="topnav"><a href="index.html">Home</a><a href="report.html">Report</a><a class="active" href="dashboard.html">Dashboard</a></nav>
+    <div class="header-user"><span id="authorityName"></span><button id="logoutBtn" class="logout-btn">Logout</button></div>
   </header>
-
   <main class="dashboard-page">
-    <div class="dash-head">
-      <div>
-        <span class="eyebrow">AUTHORITY CONSOLE</span>
-        <h1>Response overview</h1>
-        <p>Monitor incoming reports, priority incidents and response progress.</p>
-      </div>
-      <span class="status-pill"><i></i> System operational</span>
-    </div>
-
+    <div class="dash-head"><div><span class="eyebrow">AUTHORITY CONSOLE</span><h1>Response overview</h1><p>Monitor incoming reports and coordinate response.</p></div><button id="refreshBtn" class="refresh-btn">Refresh reports</button></div>
     <section class="stat-grid">
-      <div class="stat-card"><span>Total reports</span><strong>24</strong><small>Today</small></div>
-      <div class="stat-card"><span>Active incidents</span><strong>8</strong><small>Needs attention</small></div>
-      <div class="stat-card critical"><span>Critical</span><strong>3</strong><small>Priority response</small></div>
-      <div class="stat-card"><span>Resolved</span><strong>13</strong><small>Today</small></div>
+      <div class="stat-card"><span>Total reports</span><strong id="totalCount">0</strong><small>All submitted reports</small></div>
+      <div class="stat-card critical"><span>Critical</span><strong id="criticalCount">0</strong><small>Requires urgent attention</small></div>
+      <div class="stat-card"><span>High priority</span><strong id="highCount">0</strong><small>Needs attention</small></div>
+      <div class="stat-card"><span>Pending</span><strong id="pendingCount">0</strong><small>Awaiting review</small></div>
     </section>
-
-    <section class="dashboard-grid">
-      <div class="map-card">
-        <div class="card-head">
-          <div><h2>Incident map</h2><span>Live incident locations</span></div>
-          <button class="filter-btn" type="button">All incidents ▾</button>
-        </div>
-        <div class="dashboard-map">
-          <div class="map-grid"></div>
-          <div class="map-road r1"></div>
-          <div class="map-road r2"></div>
-          <div class="map-road r3"></div>
-          <span class="map-pin p1"></span><span class="map-pin p2"></span>
-          <span class="map-pin p3"></span><span class="map-pin p4"></span>
-          <div class="map-key">
-            <span><i class="blue"></i> Active</span>
-            <span><i class="orange"></i> High</span>
-            <span><i class="red"></i> Critical</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="priority-card">
-        <div class="card-head">
-          <div><h2>Priority incidents</h2><span>Sorted by response priority</span></div>
-          <a href="incident.html">View all →</a>
-        </div>
-        <div class="incident-list">
-          <a class="incident-row" href="incident.html">
-            <span class="severity critical-dot"></span>
-            <div><strong>People reported trapped</strong><small>Building • 5 people • 4 min ago</small></div>
-            <b>Critical</b>
-          </a>
-          <a class="incident-row" href="incident.html">
-            <span class="severity high-dot"></span>
-            <div><strong>Road heavily flooded</strong><small>Area A • 10 families • 12 min ago</small></div>
-            <b>High</b>
-          </a>
-          <a class="incident-row" href="incident.html">
-            <span class="severity high-dot"></span>
-            <div><strong>Road blockage</strong><small>Main bridge • Access affected • 18 min ago</small></div>
-            <b>High</b>
-          </a>
-          <a class="incident-row" href="incident.html">
-            <span class="severity medium-dot"></span>
-            <div><strong>Infrastructure damage</strong><small>Sector 4 • 3 reports • 31 min ago</small></div>
-            <b>Medium</b>
-          </a>
-        </div>
-      </div>
+    <section class="reports-section">
+      <div class="section-heading"><div><h2>Incoming reports</h2><p id="lastUpdated">Loading reports...</p></div><select id="statusFilter" aria-label="Filter reports by status"><option value="all">All statuses</option><option value="pending">Pending</option><option value="reviewing">Reviewing</option><option value="resolved">Resolved</option></select></div>
+      <div id="message" class="message" hidden></div><div id="reportsList" class="reports-list"></div>
     </section>
   </main>
-
-  <footer>
-    <span>Disaster Response Intelligence System</span>
-    <span>Hackathon MVP • 2026</span>
-  </footer>
+  <footer><span>Disaster Response Intelligence System</span><span>Authority Console</span></footer>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>
