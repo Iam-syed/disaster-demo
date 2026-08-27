@@ -22,6 +22,7 @@ locationBtn?.addEventListener('click', () => {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude
       };
+
       locationText.textContent = 'Location added ✓';
       locationBtn.textContent = 'Location added';
       locationBtn.disabled = false;
@@ -50,6 +51,7 @@ form?.addEventListener('submit', async (event) => {
   formMessage.style.display = 'none';
 
   const occurredAt = document.getElementById('time').value;
+
   const reportData = {
     type: document.getElementById('type').value,
     description: document.getElementById('description').value.trim(),
@@ -60,7 +62,10 @@ form?.addEventListener('submit', async (event) => {
 
   try {
     const headers = { 'Content-Type': 'application/json' };
-    if (token) headers.Authorization = `Bearer ${token}`;
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     const response = await fetch(`${API_URL}/reports`, {
       method: 'POST',
@@ -69,7 +74,10 @@ form?.addEventListener('submit', async (event) => {
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Unable to submit report.');
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Unable to submit report.');
+    }
 
     formMessage.textContent = `Report submitted successfully. Report ID: ${data.report._id}`;
     formMessage.style.display = 'block';
