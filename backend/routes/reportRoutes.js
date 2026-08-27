@@ -4,8 +4,8 @@ const { authenticate, requireAuthority } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Anyone can submit a report for the MVP. If logged in, link it to that user.
-router.post('/', async (req, res, next) => {
+// Logged-in citizens can submit reports. The JWT identifies the reporter.
+router.post('/', authenticate, async (req, res, next) => {
   try {
     const { type, description, peopleAffected, occurredAt, location, photoUrl } = req.body;
 
@@ -22,7 +22,7 @@ router.post('/', async (req, res, next) => {
       occurredAt,
       location,
       photoUrl,
-      reportedBy: req.user?.userId || null
+      reportedBy: req.user.userId
     });
 
     res.status(201).json({ message: 'Report submitted successfully', report });
