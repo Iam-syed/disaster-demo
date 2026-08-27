@@ -1,1 +1,93 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Report an Incident</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/report.css"></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">DR</span><span><strong>Disaster Response</strong><small>Intelligence System</small></span></a><nav class="topnav"><a href="index.html">Home</a><a class="active" href="report.html">Report an Incident</a><a href="dashboard.html">Authority Dashboard</a></nav></header><main class="form-page"><div class="form-intro"><span class="eyebrow">CITIZEN REPORT</span><h1>Report an incident</h1><p>Share what you know. Keep it simple and provide the location and details that can help responders.</p></div><form class="report-card"><div class="field"><label for="type">What is happening?</label><select id="type"><option value="">Select incident type</option><option>Flood</option><option>Fire</option><option>Landslide</option><option>Road blockage</option><option>Building damage</option><option>People trapped</option><option>Medical emergency</option><option>Other</option></select></div><div class="field"><label for="description">Describe the situation</label><textarea id="description" rows="5" placeholder="Tell us what you can see..." required></textarea></div><div class="two-col"><div class="field"><label for="people">People affected <span>(approx.)</span></label><input id="people" type="number" min="0" placeholder="e.g. 10"></div><div class="field"><label for="time">When did it happen?</label><input id="time" type="datetime-local"></div></div><div class="field"><label>Location</label><div class="location-box"><div><strong>Location not added yet</strong><small>Location will help responders find the incident.</small></div><button type="button" class="btn btn-secondary" id="locationBtn">Use my location</button></div></div><div class="field"><label for="photo">Photo <span>(optional)</span></label><input id="photo" type="file" accept="image/*"></div><div class="form-footer"><span>Only submit information you believe is accurate.</span><button class="btn btn-primary" type="submit">Submit report →</button></div></form></main><footer><span>Disaster Response Intelligence System</span><span>Hackathon MVP • 2026</span></footer><script src="js/report.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report an Incident</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/report.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">DR</span>
+      <span><strong>Disaster Response</strong><small>Intelligence System</small></span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a class="active" href="report.html">Report an Incident</a>
+      <a href="dashboard.html">Authority Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="form-page">
+    <div class="form-intro">
+      <span class="eyebrow">CITIZEN REPORT</span>
+      <h1>Report an incident</h1>
+      <p>Share what you know. Keep it simple and provide the location and details that can help responders.</p>
+    </div>
+
+    <form class="report-card" id="reportForm">
+      <div class="field">
+        <label for="type">What is happening?</label>
+        <select id="type" required>
+          <option value="">Select incident type</option>
+          <option>Flood</option>
+          <option>Fire</option>
+          <option>Landslide</option>
+          <option>Road blockage</option>
+          <option>Building damage</option>
+          <option>People trapped</option>
+          <option>Medical emergency</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="description">Describe the situation</label>
+        <textarea id="description" rows="5" placeholder="Tell us what you can see..." required></textarea>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="people">People affected <span>(approx.)</span></label>
+          <input id="people" type="number" min="0" placeholder="e.g. 10">
+        </div>
+        <div class="field">
+          <label for="time">When did it happen?</label>
+          <input id="time" type="datetime-local">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <div class="location-box">
+          <div>
+            <strong id="locationText">Location not added yet</strong>
+            <small>Location will help responders find the incident.</small>
+          </div>
+          <button type="button" class="btn btn-secondary" id="locationBtn">Use my location</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="photo">Photo <span>(optional)</span></label>
+        <input id="photo" type="file" accept="image/*">
+      </div>
+
+      <div class="form-footer">
+        <span>Only submit information you believe is accurate.</span>
+        <button class="btn btn-primary" type="submit">Submit report →</button>
+      </div>
+      <div class="form-message" id="formMessage" aria-live="polite"></div>
+    </form>
+  </main>
+
+  <footer>
+    <span>Disaster Response Intelligence System</span>
+    <span>Hackathon MVP • 2026</span>
+  </footer>
+
+  <script src="js/report.js"></script>
+</body>
+</html>
