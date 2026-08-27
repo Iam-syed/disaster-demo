@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account | Disaster Response</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-page{max-width:560px;margin:70px auto;padding:0 22px}.auth-card{background:#fff;border:1px solid #e6e9ee;border-radius:18px;padding:30px;box-shadow:0 12px 35px rgba(20,30,50,.07)}.auth-tabs{display:flex;gap:8px;margin-bottom:25px}.auth-tabs button{flex:1;padding:12px;border:1px solid #dfe3e8;background:#fff;border-radius:10px;cursor:pointer}.auth-tabs button.active{background:#18212f;color:#fff}.auth-card input,.auth-card select{width:100%;box-sizing:border-box;padding:13px;margin-top:7px;border:1px solid #dfe3e8;border-radius:9px}.field{margin-bottom:17px}.form-message{margin-top:15px;padding:10px;border-radius:8px;display:none}.user-info{font-size:14px;color:#5b6472;margin-bottom:18px}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">DR</span><span><strong>Disaster Response</strong><small>Intelligence System</small></span></a>
+    <nav class="topnav"><a href="index.html">Home</a><a href="report.html">Report</a><a href="dashboard.html">Dashboard</a></nav>
+  </header>
+  <main class="auth-page">
+    <span class="eyebrow">ACCOUNT ACCESS</span>
+    <h1 id="title">Sign in</h1>
+    <p id="subtitle">Sign in to manage your Disaster Response account.</p>
+    <div class="auth-card">
+      <div class="auth-tabs"><button id="loginTab" class="active">Sign in</button><button id="registerTab">Create account</button></div>
+      <form id="authForm">
+        <div class="field" id="nameField" style="display:none"><label>Name</label><input id="name" type="text" autocomplete="name"></div>
+        <div class="field"><label>Email</label><input id="email" type="email" required autocomplete="email"></div>
+        <div class="field"><label>Password</label><input id="password" type="password" required minlength="8" autocomplete="current-password"></div>
+        <div class="field" id="roleField" style="display:none"><label>Account type</label><select id="role"><option value="citizen">Citizen</option><option value="authority">Authority</option></select></div>
+        <button class="btn btn-primary" type="submit" id="submitBtn">Sign in →</button>
+      </form>
+      <div class="form-message" id="message"></div>
+    </div>
+  </main>
+  <script src="js/auth.js"></script>
+</body>
+</html>
