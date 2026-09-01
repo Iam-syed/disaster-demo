@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <style>
-    .detail-page{max-width:1000px;margin:0 auto;padding:40px 20px 70px}.back{display:inline-block;margin-bottom:24px}.detail-head{margin-bottom:24px}.detail-head h1{margin:6px 0}.detail-head p{color:#64748b}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.detail-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;box-shadow:0 6px 24px rgba(0,0,0,.05)}.detail-card h2{margin-top:0}.detail-card p{line-height:1.6}.badge{font-size:12px;padding:5px 9px;border-radius:999px;background:#eef2ff;margin-left:8px}.timeline{border-left:2px solid #dbeafe;padding-left:18px}.timeline div{margin-bottom:18px}.timeline small{display:block;color:#64748b;margin-top:4px}.control-card{margin-top:20px}.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.control-grid label{font-weight:600}.control-grid select{display:block;width:100%;margin-top:8px;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}.save-btn{margin-top:20px;padding:12px 20px;border:0;border-radius:10px;cursor:pointer;font-weight:700}.save-btn:disabled{opacity:.6;cursor:not-allowed}.message{margin-top:15px;padding:10px 12px;border-radius:8px}.loading{padding:30px;text-align:center}@media(max-width:700px){.detail-grid,.control-grid{grid-template-columns:1fr}}
+    .detail-page{max-width:1000px;margin:0 auto;padding:40px 20px 70px}.back{display:inline-block;margin-bottom:24px}.detail-head{margin-bottom:24px}.detail-head h1{margin:6px 0}.detail-head p{color:#64748b}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.detail-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;box-shadow:0 6px 24px rgba(0,0,0,.05)}.detail-card h2{margin-top:0}.detail-card p{line-height:1.6}.badge{font-size:12px;padding:5px 9px;border-radius:999px;background:#eef2ff;margin-left:8px}.timeline{border-left:2px solid #dbeafe;padding-left:18px}.timeline div{margin-bottom:18px}.timeline small{display:block;color:#64748b;margin-top:4px}.control-card{margin-top:20px}.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.control-grid label{font-weight:600}.control-grid select{display:block;width:100%;margin-top:8px;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}.save-btn,.ai-btn{margin-top:20px;padding:12px 20px;border:0;border-radius:10px;cursor:pointer;font-weight:700}.save-btn:disabled,.ai-btn:disabled{opacity:.6;cursor:not-allowed}.message{margin-top:15px;padding:10px 12px;border-radius:8px}.loading{padding:30px;text-align:center}.ai-card{margin-top:20px}.ai-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}.ai-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:13px}.ai-item span{display:block;font-size:12px;color:#64748b}.ai-item strong{display:block;margin-top:5px}.ai-note{margin-top:15px;color:#475569;font-size:13px;line-height:1.5}.keyword-list{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}.keyword{padding:4px 8px;border-radius:999px;background:#eef2ff;font-size:12px}@media(max-width:700px){.detail-grid,.control-grid{grid-template-columns:1fr}.ai-grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
@@ -16,151 +16,33 @@
     <nav class="topnav"><a href="index.html">Home</a><a href="report.html">Report</a><a class="active" href="dashboard.html">Dashboard</a></nav>
     <div class="header-user"><span id="authorityName"></span><button id="logoutBtn" class="logout-btn">Logout</button></div>
   </header>
-
   <main class="detail-page">
     <a class="back" href="dashboard.html">← Back to dashboard</a>
     <div id="pageContent" class="loading">Loading incident...</div>
   </main>
-
   <footer><span>Disaster Response Intelligence System</span><span>Authority Console</span></footer>
-
   <script>
-    const API_URL = 'http://localhost:5000/api';
-    const token = localStorage.getItem('disasterToken');
-    const user = JSON.parse(localStorage.getItem('disasterUser') || 'null');
-    const reportId = new URLSearchParams(window.location.search).get('id');
-    const pageContent = document.getElementById('pageContent');
-
-    if (!token || user?.role !== 'authority') {
-      window.location.href = 'auth.html';
-    } else {
-      document.getElementById('authorityName').textContent = user.name || 'Authority';
-      loadIncident();
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    }
-    function titleCase(value) {
-      return String(value || '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-    function formatDate(value) {
-      if (!value) return 'Not provided';
-      const d = new Date(value);
-      return Number.isNaN(d.getTime()) ? 'Not provided' : d.toLocaleString();
-    }
-    function locationText(location) {
-      if (!location) return 'Location unavailable';
-      const coords = location.latitude !== undefined && location.longitude !== undefined
-        ? `${Number(location.latitude).toFixed(5)}, ${Number(location.longitude).toFixed(5)}` : '';
-      return [location.address, coords].filter(Boolean).join(' • ') || 'Location unavailable';
-    }
-
-    async function loadIncident() {
-      if (!reportId) {
-        pageContent.innerHTML = '<div class="message">No report ID was provided.</div>';
-        return;
-      }
-      try {
-        const response = await fetch(`${API_URL}/reports/${encodeURIComponent(reportId)}`, {headers:{Authorization:`Bearer ${token}`}});
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unable to load report.');
-        renderIncident(data);
-      } catch (error) {
-        pageContent.innerHTML = `<div class="message">${escapeHtml(error.message)}</div>`;
-      }
-    }
-
-    function renderIncident(report) {
-      const severity = String(report.severity || 'medium').toLowerCase();
-      const status = String(report.status || 'new').toLowerCase();
-      const reporter = report.reportedBy?.name || report.reportedBy?.email || 'Unknown reporter';
-      const location = locationText(report.location);
-      pageContent.innerHTML = `
-        <div class="detail-head">
-          <span class="eyebrow">INCIDENT DETAILS</span>
-          <h1>${escapeHtml(titleCase(report.type))}</h1>
-          <p>Report ID: ${escapeHtml(report._id)} • Submitted ${escapeHtml(formatDate(report.createdAt || report.occurredAt))}</p>
-        </div>
-        <div class="detail-grid">
-          <section class="detail-card">
-            <h2>Incident summary <span class="badge">${escapeHtml(titleCase(severity))}</span></h2>
-            <p><strong>Type:</strong> ${escapeHtml(titleCase(report.type))}</p>
-            <p><strong>Description:</strong> ${escapeHtml(report.description)}</p>
-            <p><strong>Location:</strong> ${escapeHtml(location)}</p>
-            <p><strong>People affected:</strong> ${escapeHtml(report.peopleAffected ?? 0)}</p>
-            <p><strong>Occurred:</strong> ${escapeHtml(formatDate(report.occurredAt))}</p>
-            <p><strong>Reported by:</strong> ${escapeHtml(reporter)}</p>
-          </section>
-          <section class="detail-card">
-            <h2>Response status</h2>
-            <div class="timeline">
-              <div><strong>Reported</strong><small>${escapeHtml(formatDate(report.createdAt))}</small></div>
-              <div><strong>${escapeHtml(titleCase(status))}</strong><small>Current report status</small></div>
-            </div>
-          </section>
-        </div>
-        <section class="detail-card control-card">
-          <h2>Authority action</h2>
-          <div class="control-grid">
-            <label>Severity
-              <select id="severitySelect">
-                <option value="low" ${severity==='low'?'selected':''}>Low</option>
-                <option value="medium" ${severity==='medium'?'selected':''}>Medium</option>
-                <option value="high" ${severity==='high'?'selected':''}>High</option>
-                <option value="critical" ${severity==='critical'?'selected':''}>Critical</option>
-              </select>
-            </label>
-            <label>Status
-              <select id="statusSelect">
-                <option value="new" ${status==='new'?'selected':''}>New</option>
-                <option value="under_review" ${status==='under_review'?'selected':''}>Under Review</option>
-                <option value="verified" ${status==='verified'?'selected':''}>Verified</option>
-                <option value="resolved" ${status==='resolved'?'selected':''}>Resolved</option>
-              </select>
-            </label>
-          </div>
-          <button id="saveBtn" class="save-btn">Save update</button>
-          <div id="saveMessage" class="message" hidden></div>
-        </section>`;
-
-      document.getElementById('saveBtn').addEventListener('click', saveUpdate);
-    }
-
-    async function saveUpdate() {
-      const button = document.getElementById('saveBtn');
-      const saveMessage = document.getElementById('saveMessage');
-      button.disabled = true;
-      button.textContent = 'Saving...';
-      saveMessage.hidden = true;
-      try {
-        const response = await fetch(`${API_URL}/reports/${encodeURIComponent(reportId)}`, {
-          method: 'PATCH',
-          headers: {'Content-Type':'application/json', Authorization:`Bearer ${token}`},
-          body: JSON.stringify({
-            severity: document.getElementById('severitySelect').value,
-            status: document.getElementById('statusSelect').value
-          })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unable to update report.');
-        saveMessage.textContent = 'Report updated successfully.';
-        saveMessage.hidden = false;
-        button.textContent = 'Saved';
-      } catch (error) {
-        saveMessage.textContent = error.message;
-        saveMessage.hidden = false;
-        button.textContent = 'Save update';
-      } finally {
-        button.disabled = false;
-      }
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('disasterToken');
-      localStorage.removeItem('disasterUser');
-      window.location.href = 'auth.html';
-    });
+    const API_URL='http://localhost:5000/api';
+    const token=localStorage.getItem('disasterToken');
+    const user=JSON.parse(localStorage.getItem('disasterUser')||'null');
+    const reportId=new URLSearchParams(window.location.search).get('id');
+    const pageContent=document.getElementById('pageContent');
+    if(!token||user?.role!=='authority'){window.location.href='auth.html';}else{document.getElementById('authorityName').textContent=user.name||'Authority';loadIncident();}
+    function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+    function titleCase(value){return String(value||'').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+    function formatDate(value){if(!value)return'Not provided';const d=new Date(value);return Number.isNaN(d.getTime())?'Not provided':d.toLocaleString();}
+    function locationText(location){if(!location)return'Location unavailable';const coords=location.latitude!==undefined&&location.longitude!==undefined?`${Number(location.latitude).toFixed(5)}, ${Number(location.longitude).toFixed(5)}`:'';return[location.address,coords].filter(Boolean).join(' • ')||'Location unavailable';}
+    async function loadIncident(){if(!reportId){pageContent.innerHTML='<div class="message">No report ID was provided.</div>';return;}try{const response=await fetch(`${API_URL}/reports/${encodeURIComponent(reportId)}`,{headers:{Authorization:`Bearer ${token}`}});const data=await response.json();if(!response.ok)throw new Error(data.error||'Unable to load report.');renderIncident(data);}catch(error){pageContent.innerHTML=`<div class="message">${escapeHtml(error.message)}</div>`;}}
+    function renderIncident(report){const severity=String(report.severity||'medium').toLowerCase();const status=String(report.status||'new').toLowerCase();const reporter=report.reportedBy?.name||report.reportedBy?.email||'Unknown reporter';const location=locationText(report.location);pageContent.innerHTML=`
+      <div class="detail-head"><span class="eyebrow">INCIDENT DETAILS</span><h1>${escapeHtml(titleCase(report.type))}</h1><p>Report ID: ${escapeHtml(report._id)} • Submitted ${escapeHtml(formatDate(report.createdAt||report.occurredAt))}</p></div>
+      <div class="detail-grid"><section class="detail-card"><h2>Incident summary <span class="badge">${escapeHtml(titleCase(severity))}</span></h2><p><strong>Type:</strong> ${escapeHtml(titleCase(report.type))}</p><p><strong>Description:</strong> ${escapeHtml(report.description)}</p><p><strong>Location:</strong> ${escapeHtml(location)}</p><p><strong>People affected:</strong> ${escapeHtml(report.peopleAffected??0)}</p><p><strong>Occurred:</strong> ${escapeHtml(formatDate(report.occurredAt))}</p><p><strong>Reported by:</strong> ${escapeHtml(reporter)}</p></section>
+      <section class="detail-card"><h2>Response status</h2><div class="timeline"><div><strong>Reported</strong><small>${escapeHtml(formatDate(report.createdAt))}</small></div><div><strong>${escapeHtml(titleCase(status))}</strong><small>Current report status</small></div></div></section></div>
+      <section class="detail-card ai-card"><h2>🤖 AI-assisted analysis</h2><p>Generate a transparent recommendation from the report description. The authority remains the final decision maker.</p><button id="aiBtn" class="ai-btn">Analyze report</button><div id="aiResult"></div></section>
+      <section class="detail-card control-card"><h2>Authority action</h2><div class="control-grid"><label>Severity<select id="severitySelect"><option value="low" ${severity==='low'?'selected':''}>Low</option><option value="medium" ${severity==='medium'?'selected':''}>Medium</option><option value="high" ${severity==='high'?'selected':''}>High</option><option value="critical" ${severity==='critical'?'selected':''}>Critical</option></select></label><label>Status<select id="statusSelect"><option value="new" ${status==='new'?'selected':''}>New</option><option value="under_review" ${status==='under_review'?'selected':''}>Under Review</option><option value="verified" ${status==='verified'?'selected':''}>Verified</option><option value="resolved" ${status==='resolved'?'selected':''}>Resolved</option></select></label></div><button id="saveBtn" class="save-btn">Save update</button><div id="saveMessage" class="message" hidden></div></section>`;
+      document.getElementById('saveBtn').addEventListener('click',saveUpdate);document.getElementById('aiBtn').addEventListener('click',analyzeReport);}
+    async function analyzeReport(){const button=document.getElementById('aiBtn');const result=document.getElementById('aiResult');button.disabled=true;button.textContent='Analyzing...';result.innerHTML='';try{const response=await fetch(`${API_URL}/reports/${encodeURIComponent(reportId)}/analyze`,{method:'POST',headers:{Authorization:`Bearer ${token}`}});const data=await response.json();if(!response.ok)throw new Error(data.error||'AI analysis failed.');const a=data.analysis;const keywords=(a.matchedKeywords||[]).map(k=>`<span class="keyword">${escapeHtml(k)}</span>`).join('');result.innerHTML=`<div class="ai-grid"><div class="ai-item"><span>Incident type</span><strong>${escapeHtml(titleCase(a.incidentType))}</strong></div><div class="ai-item"><span>Confidence</span><strong>${Math.round(a.confidence*100)}%</strong></div><div class="ai-item"><span>Suggested severity</span><strong>${escapeHtml(titleCase(a.severity))}</strong></div><div class="ai-item"><span>Urgency</span><strong>${escapeHtml(titleCase(a.urgency))}</strong></div></div><div class="ai-item" style="margin-top:12px"><span>Priority score</span><strong>${escapeHtml(a.priorityScore)}/100</strong></div><p class="ai-note">${escapeHtml(a.explanation)}</p>${keywords?`<div class="keyword-list">${keywords}</div>`:''}`;}catch(error){result.innerHTML=`<div class="message">${escapeHtml(error.message)}</div>`;}finally{button.disabled=false;button.textContent='Analyze again';}}
+    async function saveUpdate(){const button=document.getElementById('saveBtn');const saveMessage=document.getElementById('saveMessage');button.disabled=true;button.textContent='Saving...';saveMessage.hidden=true;try{const response=await fetch(`${API_URL}/reports/${encodeURIComponent(reportId)}`,{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({severity:document.getElementById('severitySelect').value,status:document.getElementById('statusSelect').value})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Unable to update report.');saveMessage.textContent='Report updated successfully.';saveMessage.hidden=false;button.textContent='Saved';}catch(error){saveMessage.textContent=error.message;saveMessage.hidden=false;button.textContent='Save update';}finally{button.disabled=false;}}
+    document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('disasterToken');localStorage.removeItem('disasterUser');window.location.href='auth.html';});
   </script>
 </body>
 </html>
