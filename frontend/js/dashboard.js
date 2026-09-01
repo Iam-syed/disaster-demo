@@ -14,6 +14,8 @@ const message = document.getElementById('message');
 const statusFilter = document.getElementById('statusFilter');
 const refreshBtn = document.getElementById('refreshBtn');
 let reports = [];
+let incidentMap = null;
+let markerLayer = null;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
@@ -56,6 +58,43 @@ function renderReports() {
     button.addEventListener('click', () => { window.location.href = `incident.html?id=${encodeURIComponent(button.dataset.id)}`; });
   });
 }
+function markerColor(severity) {
+  return ({critical:'#dc2626',high:'#ea580c',medium:'#ca8a04',low:'#16a34a'}[severity] || '#2563eb');
+}
+function updateMap() {
+  if (!window.L) return;
+  if (!incidentMap) {
+    incidentMap = L.map('incidentMap').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(incidentMap);
+    markerLayer = L.layerGroup().addTo(incidentMap);
+  }
+  markerLayer.clearLayers();
+  const points = [];
+  reports.forEach(report => {
+    const lat = Number(report.location?.latitude);
+    const lng = Number(report.location?.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+    points.push([lat,lng]);
+    const severity = String(report.severity || 'medium').toLowerCase();
+    const status = String(report.status || 'new').toLowerCase();
+    const color = markerColor(severity);
+    const icon = L.divIcon({
+      className: '',
+      html: `<span style="display:block;width:16px;height:16px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 1px 5px rgba(0,0,0,.4)"></span>`,
+      iconSize: [16,16], iconAnchor: [8,8]
+    });
+    const marker = L.marker([lat,lng], {icon});
+    marker.bindPopup(`<div class="popup-title">${escapeHtml(titleCase(report.type))}</div><div><strong>Severity:</strong> ${escapeHtml(titleCase(severity))}</div><div><strong>Status:</strong> ${escapeHtml(titleCase(status))}</div><div><strong>Affected:</strong> ${escapeHtml(report.peopleAffected ?? 0)}</div><div><strong>Reporter:</strong> ${escapeHtml(report.reportedBy?.name || report.reportedBy?.email || 'Unknown')}</div><a class="popup-btn" href="incident.html?id=${encodeURIComponent(report._id)}">View details</a>`);
+    markerLayer.addLayer(marker);
+  });
+  if (points.length === 1) incidentMap.setView(points[0], 13);
+  else if (points.length > 1) incidentMap.fitBounds(points, {padding:[30,30], maxZoom:13});
+  else incidentMap.setView([20.5937,78.9629],5);
+  setTimeout(() => incidentMap.invalidateSize(), 100);
+}
 async function loadReports() {
   refreshBtn.disabled = true;
   refreshBtn.textContent = 'Loading...';
@@ -67,6 +106,7 @@ async function loadReports() {
     reports = data.reports || [];
     renderStats();
     renderReports();
+    updateMap();
     document.getElementById('lastUpdated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
   } catch (error) {
     message.textContent = error.message;
