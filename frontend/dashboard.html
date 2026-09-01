@@ -6,6 +6,11 @@
   <title>Authority Dashboard | Disaster Response</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3HymWm6pZ2tL6sK6p7y9V7pQf4nY=" crossorigin="">
+  <style>
+    .map-section{margin-top:24px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.05)}
+    .map-section h2{margin:0 0 6px}.map-section p{margin:0 0 16px;color:#64748b}.map-wrap{height:430px;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb}.map-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:#475569}.legend-item{display:flex;align-items:center;gap:6px}.legend-dot{width:11px;height:11px;border-radius:50%;display:inline-block}.leaflet-popup-content{line-height:1.5}.popup-title{font-weight:700;font-size:15px;margin-bottom:6px}.popup-btn{display:inline-block;margin-top:8px;padding:7px 10px;border:0;border-radius:7px;background:#111827;color:#fff;cursor:pointer;text-decoration:none;font-size:12px}
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -21,12 +26,24 @@
       <div class="stat-card"><span>High priority</span><strong id="highCount">0</strong><small>Needs attention</small></div>
       <div class="stat-card"><span>Pending</span><strong id="pendingCount">0</strong><small>Awaiting review</small></div>
     </section>
+    <section class="map-section">
+      <h2>Incident map</h2>
+      <p>Geographic view of reports with severity-based markers.</p>
+      <div id="incidentMap" class="map-wrap"></div>
+      <div class="map-legend">
+        <span class="legend-item"><i class="legend-dot" style="background:#dc2626"></i>Critical</span>
+        <span class="legend-item"><i class="legend-dot" style="background:#ea580c"></i>High</span>
+        <span class="legend-item"><i class="legend-dot" style="background:#ca8a04"></i>Medium</span>
+        <span class="legend-item"><i class="legend-dot" style="background:#16a34a"></i>Low</span>
+      </div>
+    </section>
     <section class="reports-section">
       <div class="section-heading"><div><h2>Incoming reports</h2><p id="lastUpdated">Loading reports...</p></div><select id="statusFilter" aria-label="Filter reports by status"><option value="all">All statuses</option><option value="pending">Pending</option><option value="reviewing">Reviewing</option><option value="resolved">Resolved</option></select></div>
       <div id="message" class="message" hidden></div><div id="reportsList" class="reports-list"></div>
     </section>
   </main>
   <footer><span>Disaster Response Intelligence System</span><span>Authority Console</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/dashboard.js"></script>
 </body>
 </html>
