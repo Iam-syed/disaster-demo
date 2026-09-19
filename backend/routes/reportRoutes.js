@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+const { spawnSync } = require('child_process');
 const Report = require('../models/Report');
 const Incident = require('../models/Incident');
 const { authenticate, requireAuthority } = require('../middleware/auth');
@@ -6,63 +8,45 @@ const { clusterReport, clusterAllReports } = require('../services/duplicateDetec
 
 const router = express.Router();
 
-function analyzeReport({ type, description, peopleAffected = 0 }) {
-  const text = `${type || ''} ${description || ''}`.toLowerCase();
-  const rules = [
-    ['flood', ['flood', 'flooded', 'water entered', 'waterlogging', 'waterlogged', 'overflow']],
-    ['landslide', ['landslide', 'mudslide', 'rockfall', 'rocks fell', 'soil collapsed']],
-    ['fire', ['fire', 'flames', 'burning', 'smoke']],
-    ['earthquake', ['earthquake', 'tremor', 'shaking']],
-    ['cyclone', ['cyclone', 'storm', 'strong winds', 'high winds']],
-    ['accident', ['accident', 'collision', 'crash', 'vehicle overturned']],
-    ['building_collapse', ['building collapsed', 'house collapsed', 'structure collapsed', 'collapse']],
-    ['medical', ['injured', 'injury', 'medical emergency', 'ambulance', 'unconscious']]
-  ];
+function analyzeReportWithModel(report) {
+  const pythonCommand = process.env.AI_PYTHON_COMMAND || (process.platform === 'win32' ? 'python' : 'python3');
+  const scriptPath = path.join(__dirname, '..', '..', 'ai', 'predict.py');
 
-  let incidentType = String(type || '').toLowerCase().trim();
-  let matchedKeywords = [];
-  let confidence = 0.55;
+  const payload = JSON.stringify({
+    type: report.type,
+    description: report.description,
+    peopleAffected: report.peopleAffected || 0
+  });
 
-  for (const [candidate, keywords] of rules) {
-    const matches = keywords.filter(keyword => text.includes(keyword));
-    if (matches.length && (incidentType === 'unknown' || !incidentType || incidentType === 'other')) {
-      incidentType = candidate;
-      matchedKeywords = matches;
-      confidence = Math.min(0.95, 0.68 + matches.length * 0.08);
-      break;
+  const result = spawnSync(pythonCommand, [scriptPath], {
+    input: payload,
+    encoding: 'utf8',
+    timeout: 15000,
+    windowsHide: true
+  });
+
+  if (result.error) {
+    if (result.error.code === 'ENOENT') {
+      throw new Error(
+        'Python ML runtime not found. Install Python and the packages in ai/requirements.txt.'
+      );
     }
+    throw result.error;
   }
 
-  const people = Math.max(0, Number(peopleAffected) || 0);
-  const criticalWords = ['trapped', 'missing', 'collapsed', 'life threatening', 'life-threatening', 'cannot escape', 'urgent'];
-  const highWords = ['injured', 'evacuate', 'evacuation', 'severe', 'dangerous', 'blocked', 'stranded'];
-  const criticalMatches = criticalWords.filter(word => text.includes(word));
-  const highMatches = highWords.filter(word => text.includes(word));
+  if (result.status !== 0) {
+    const message = (result.stderr || '').trim();
+    if (message.includes('Trained model not found')) {
+      throw new Error('Trained severity model not found. Run: python ai/train_model.py');
+    }
+    throw new Error(message || 'ML prediction failed.');
+  }
 
-  let severity = 'low';
-  if (criticalMatches.length || people >= 50) severity = 'critical';
-  else if (highMatches.length || people >= 20) severity = 'high';
-  else if (people >= 5 || matchedKeywords.length >= 2) severity = 'medium';
-
-  let urgency = 'routine';
-  if (severity === 'critical') urgency = 'immediate';
-  else if (severity === 'high') urgency = 'urgent';
-  else if (severity === 'medium') urgency = 'soon';
-
-  const severityScore = { low: 25, medium: 50, high: 75, critical: 100 }[severity];
-  const peopleScore = Math.min(25, people);
-  const keywordScore = Math.min(20, criticalMatches.length * 12 + highMatches.length * 7);
-  const priorityScore = Math.min(100, Math.round(severityScore * 0.55 + peopleScore + keywordScore));
-
-  return {
-    incidentType,
-    confidence: Number(confidence.toFixed(2)),
-    severity,
-    urgency,
-    priorityScore,
-    matchedKeywords: [...new Set([...matchedKeywords, ...criticalMatches, ...highMatches])],
-    explanation: `Suggested from incident description, disaster type and ${people} reported affected people. Authority verification is required before changing the official report.`
-  };
+  try {
+    return JSON.parse(result.stdout);
+  } catch {
+    throw new Error('ML prediction returned invalid JSON.');
+  }
 }
 
 router.post('/', authenticate, async (req, res, next) => {
@@ -170,7 +154,7 @@ router.post('/:id/analyze', authenticate, requireAuthority, async (req, res, nex
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ error: 'Report not found' });
 
-    const analysis = analyzeReport(report);
+    const analysis = analyzeReportWithModel(report);
     res.json({ reportId: report._id, analysis });
   } catch (error) {
     console.error('AI ANALYSIS ERROR:', error);

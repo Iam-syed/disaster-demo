@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import joblib
 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -39,6 +42,22 @@ model = Pipeline([
     ))
 ])
 
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+model.fit(X_train, y_train)
+
+predictions = model.predict(X_test)
+accuracy = accuracy_score(y_test, predictions)
+
+print(f"Validation accuracy: {accuracy:.2%}")
+print(classification_report(y_test, predictions, zero_division=0))
+
+# Retrain on all labelled examples before saving the final model.
 model.fit(X, y)
 
 os.makedirs(MODEL_DIR, exist_ok=True)
