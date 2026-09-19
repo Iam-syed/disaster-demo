@@ -22,7 +22,8 @@ const reportSchema = new mongoose.Schema(
       enum: ['low', 'medium', 'high', 'critical'],
       default: 'medium'
     },
-    reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    incidentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Incident', default: null }
   },
   { timestamps: true }
 );
