@@ -1,0 +1,80 @@
+type,description,peopleAffected,severity
+flood,"light rain caused waterlogging on one street",2,low
+flood,"water accumulated on the road but traffic is moving",3,low
+flood,"minor flooding near the market",4,low
+flood,"water entered a few shops",6,medium
+flood,"flood water entered several houses",12,medium
+flood,"water level is rising and residents need help",15,medium
+flood,"heavy flooding has blocked the main road",22,high
+flood,"many houses are flooded and families are stranded",28,high
+flood,"severe flood water has trapped residents inside houses",35,high
+flood,"people are trapped on rooftops because of rising flood water",55,critical
+flood,"major flooding with missing people and trapped families",70,critical
+flood,"deep flood water has entered houses and people cannot escape",80,critical
+landslide,"small amount of soil fell beside a road",2,low
+landslide,"minor rockfall near the roadside",3,low
+landslide,"small landslide on a local path",4,low
+landslide,"mud covered part of the road",7,medium
+landslide,"soil collapse blocked one lane",10,medium
+landslide,"rocks have fallen and traffic is slowed",12,medium
+landslide,"large landslide has blocked the highway",25,high
+landslide,"landslide blocked the road and stranded vehicles",30,high
+landslide,"major landslide has damaged houses and injured people",35,high
+landslide,"people are trapped after a large landslide",52,critical
+landslide,"major landslide has collapsed houses and people are missing",65,critical
+landslide,"landslide has completely blocked the highway and trapped families",75,critical
+fire,"small waste fire with no injuries",1,low
+fire,"small fire in an empty area",2,low
+fire,"minor electrical fire contained quickly",2,low
+fire,"fire in a small shop with nearby smoke",5,medium
+fire,"house fire requires evacuation of residents",8,medium
+fire,"fire spreading between nearby shops",12,medium
+fire,"large building fire with heavy smoke",20,high
+fire,"fire is spreading and several people need evacuation",25,high
+fire,"large fire has injured residents and blocked exits",30,high
+fire,"people are trapped inside a burning building",50,critical
+fire,"major building fire with trapped and injured people",65,critical
+fire,"severe fire emergency and people cannot escape",80,critical
+earthquake,"minor tremor felt by a few residents",3,low
+earthquake,"weak shaking caused no visible damage",4,low
+earthquake,"moderate tremor caused small cracks",5,medium
+earthquake,"earthquake damaged walls in several houses",10,medium
+earthquake,"strong shaking damaged buildings",18,medium
+earthquake,"earthquake caused structural damage and injuries",22,high
+earthquake,"severe earthquake damaged many buildings",35,high
+earthquake,"earthquake caused collapsed structures and injured people",40,high
+earthquake,"major earthquake has collapsed buildings and trapped residents",55,critical
+earthquake,"strong earthquake with missing people and collapsed houses",70,critical
+accident,"minor vehicle accident with no injuries",2,low
+accident,"small collision causing traffic delay",3,low
+accident,"road accident with one minor injury",4,medium
+accident,"vehicle collision with several injured people",8,medium
+accident,"bus accident has injured many passengers",18,high
+accident,"major road accident with people trapped in vehicles",25,high
+accident,"large collision with severely injured passengers",35,high
+accident,"major accident with trapped and missing people",55,critical
+accident,"severe crash with many people trapped inside vehicles",70,critical
+cyclone,"strong winds caused a few fallen branches",2,low
+cyclone,"minor storm damage in one street",3,low
+cyclone,"heavy rain and winds damaged some property",6,medium
+cyclone,"storm damaged houses and blocked roads",12,medium
+cyclone,"strong cyclone winds have damaged many houses",22,high
+cyclone,"cyclone has caused flooding and stranded residents",30,high
+cyclone,"severe cyclone with damaged buildings and injuries",40,high
+cyclone,"major cyclone has trapped families and caused widespread damage",60,critical
+cyclone,"extreme cyclone conditions with missing and trapped people",80,critical
+building_collapse,"small wall section collapsed with no injuries",2,low
+building_collapse,"minor structure damage after heavy rain",3,low
+building_collapse,"part of a building has collapsed",6,medium
+building_collapse,"roof collapse injured one person",5,medium
+building_collapse,"building collapse damaged nearby property",12,medium
+building_collapse,"large structure partially collapsed and people are injured",20,high
+building_collapse,"building collapsed and several people are trapped",35,high
+building_collapse,"major building collapse with trapped residents",55,critical
+building_collapse,"building completely collapsed with missing people",75,critical
+other,"fallen branch is blocking a small lane",2,low
+other,"minor road obstruction reported",3,low
+other,"road is partially blocked and traffic is slow",6,medium
+other,"large obstruction has blocked an important road",20,high
+other,"road blockage has stranded many people",35,high
+other,"people are trapped because the main route is completely blocked",55,critical
