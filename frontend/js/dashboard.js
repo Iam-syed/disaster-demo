@@ -93,7 +93,8 @@ function updateMap() {
   if (points.length === 1) incidentMap.setView(points[0], 13);
   else if (points.length > 1) incidentMap.fitBounds(points, {padding:[30,30], maxZoom:13});
   else incidentMap.setView([20.5937,78.9629],5);
-  setTimeout(() => incidentMap.invalidateSize(), 100);
+  setTimeout(() => incidentMap.invalidateSize(true), 500);
+  //setTimeout(() => incidentMap.invalidateSize(), 100);
 }
 async function loadReports() {
   refreshBtn.disabled = true;
